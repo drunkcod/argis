@@ -1,6 +1,6 @@
 {
   "name": "@drunkcod/argis",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tiny method arg checking with strong types.",
   "scripts": {
     "build": "rimraf lib && tsc",
@@ -11,7 +11,8 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "!lib/**/*.spec.*"
   ],
   "devDependencies": {
     "@jest/globals": "^29.7.0",
