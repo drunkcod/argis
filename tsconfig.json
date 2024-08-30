@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "lib": ["ES2022"],
+      "module": "commonjs",
+      "target": "ES2022",
+      "strict": true,
+      "declaration": true,
+      "outDir": "lib",
+      "esModuleInterop": true,
+      "baseUrl": "."
+    },
+    "exclude": [
+      "node_modules",
+      "lib",
+      "**/*.spec.ts",
+    ]
+  }
