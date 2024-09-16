@@ -1,10 +1,13 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn } from './';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil } from './index';
 
 describe('isNil', () => {
     test('null', () => expect(isNil(null)).toBe(true));
     test('undefined', () => expect(isNil(void 0)).toBe(true));
     test('{}', () => expect(isNil({})).toBe(false));
+    test('x.value is nil', () => expect(isNil({ value: null }, 'value')).toBe(true));
+    test('x.value is not nil', () => expect(isNil({ value: 42 }, 'value')).toBe(false));
+    test('x.value when x is nil', () => expect(isNil(null as unknown as ({ value: string }), 'value')).toBe(true));
 });
 
 describe('isNotNil', () => {
@@ -20,7 +23,7 @@ describe('argNotNil', () => {
     it('rases ArgumentError on undefined', () => {
         expect(() => argNotNil({ x: undefined as unknown as string}, 'x')).toThrow(ArgumentError)
     });
-})
+});
 
 describe('assertOwn', () => {
     it('raise ArgumentError if missing', () => {
@@ -33,5 +36,14 @@ describe('assertOwn', () => {
         const x = { message: 'hello world'} as object;
         assertOwn(x, 'message');
         expect(x.message).toEqual('hello world');
+    });
+});
+
+describe('assertNotNil', () => {
+    it('raises ArgumentError on null', () => {
+        expect(() => assertNotNil(null as unknown as object)).toThrow();
+    });
+    it('raises ArgumentError on undefined', () => {
+        expect(() => assertNotNil(undefined)).toThrow();
     });
 })

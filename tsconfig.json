@@ -7,10 +7,11 @@
       "declaration": true,
       "outDir": "lib",
       "esModuleInterop": true,
-      "baseUrl": "."
+      "baseUrl": ".",
+      "allowJs": false
     },
     "exclude": [
-      "node_modules",
-      "lib"
+      "lib",
+      "node_modules"
     ]
   }

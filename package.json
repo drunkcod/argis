@@ -8,8 +8,8 @@
   },
   "author": "Tobbe Gyllebring",
   "license": "MIT",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
     "lib/**/*",
     "!lib/**/*.spec.*"

@@ -21,14 +21,20 @@ export class ArgumentError extends Error {
     }
 }
 
-export function isNil(x: any): x is null | undefined {
-    return x == null;
+export function isNil(x: any): x is null | undefined;
+export function isNil<T extends object>(x: T | null, key: keyof T): x is T & WithKey<typeof key, null | undefined>;
+export function isNil(x: any, key?: any): boolean {
+    return x == null || (key !== undefined && x[key] == null);
 }
 
 export function isNotNil<T>(x?: T): x is T;
 export function isNotNil<T, K extends keyof T>(x: T, key: K): x is T & { [P in K]-?: NonNullable<T[K]> } 
 export function isNotNil<T, K extends keyof T>(x?: T, key?: K) {
 	return !isNil(x) && (key === undefined || !isNil(x[key]));
+}
+
+export function assertNotNil<T>(x: T | null): asserts x is T {
+    if(x == null) ArgumentError.null('Unexpected null');
 }
 
 export function argNotNil<T, K extends keyof T>(x: T, key: K): asserts x is T & { [P in K]-?: NonNullable<T[K]> } {
