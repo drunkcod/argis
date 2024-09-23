@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil } from './index';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined } from './index';
 
 describe('isNil', () => {
     test('null', () => expect(isNil(null)).toBe(true));
@@ -46,4 +46,11 @@ describe('assertNotNil', () => {
     it('raises ArgumentError on undefined', () => {
         expect(() => assertNotNil(undefined)).toThrow();
     });
+})
+
+describe('intOrUndefined', () => {
+    test("valid string", () => expect(intOrUndefined("42")).toEqual(42));
+    test("empty string", () => expect(intOrUndefined("")).toBeUndefined());
+    test("null string", () => expect(intOrUndefined(null)).toBeUndefined());
+    test("undefined string", () => expect(intOrUndefined(null)).toBeUndefined());
 })

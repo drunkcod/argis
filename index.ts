@@ -48,3 +48,13 @@ export function hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x
 export function assertOwn<T extends object, K extends PropertyKey>(x: T, key: K): asserts x is T & WithKey<K> {
     hasOwn(x, key) || ArgumentError.missing({ key });
 }
+
+export function nullIfEmpty<T extends { length: number }>(x: T | null) {
+     return x == null || x.length == 0 ? null : x;
+}
+
+export function intOrUndefined(x?: string | null) : number | undefined {
+    if(isNil(x)) return undefined;
+    const v = Number.parseInt(x);
+    return Number.isNaN(v) ? undefined : v;
+}
