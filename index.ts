@@ -8,13 +8,13 @@ export class ArgumentError extends Error {
         super(message);
     }
 
-    static null(message: string) {
+    static null(message: string): never {
         const e = new ArgumentError(message);
         e.name = 'ArgumentNullError';
         throw e;
     }
 
-    static missing({ key }: { key: PropertyKey}) {
+    static missing({ key }: { key: PropertyKey}): never {
         const e = new ArgumentError(`Missing property ${String(key)}.`);
         e.name = 'MissingPropertyError';
         throw e;
@@ -41,8 +41,14 @@ export function argNotNil<T, K extends keyof T>(x: T, key: K): asserts x is T & 
     isNotNil(x, key) || ArgumentError.null(`'${String(key)}' was null or undefined`);
 }
 
-export function hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K> {
+function _hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K> {
     return Object.hasOwn(x, key)
+}
+
+export function hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K>;
+export function hasOwn<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
+export function hasOwn<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V>{
+    return _hasOwn(x, key) && (ofType == undefined || ofType(x[key]))
 }
 
 export function assertOwn<T extends object, K extends PropertyKey>(x: T, key: K): asserts x is T & WithKey<K> {

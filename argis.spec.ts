@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn } from './index.js';
 
 describe('isNil', () => {
     test('null', () => expect(isNil(null)).toBe(true));
@@ -23,6 +23,24 @@ describe('argNotNil', () => {
     it('rases ArgumentError on undefined', () => {
         expect(() => argNotNil({ x: undefined as unknown as string}, 'x')).toThrow(ArgumentError)
     });
+});
+
+describe('hasOwn', () => {
+    test('exists', () => {
+        expect(hasOwn({ answer: 42}, 'answer')).toBeTruthy();
+    });
+    test('missing', () => {
+        expect(hasOwn({ answer: 42}, 'message')).toBeFalsy();
+    });
+    test('with type check', () => {
+        const it = { answer: 42 };
+        expect(hasOwn(it, 'answer', (x: unknown) => typeof x === 'number')).toBeTruthy();
+        //it.answer is Number.
+    });
+    test('with type check failing', () => {
+        const it = { answer: 42 };
+        expect(hasOwn(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
+    })
 });
 
 describe('assertOwn', () => {
