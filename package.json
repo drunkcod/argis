@@ -1,12 +1,14 @@
 {
   "name": "@drunkcod/argis",
   "type": "module",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Tiny method arg checking with strong types.",
   "scripts": {
     "clean": "rimraf lib",
     "compile": "tsc",
-    "build": "npm-run-all clean compile --silent",
+    "cjs:compile": "tsc --module commonjs --outdir lib/cjs",
+    "cjs:fixup": "echo '{\"type\": \"commonjs\"}' > lib/cjs/package.json",
+    "build": "npm-run-all clean -p compile cjs:compile -s cjs:fixup --silent",
     "test": "jest"
   },
   "author": "Tobbe Gyllebring",
@@ -17,12 +19,24 @@
     "lib/**/*",
     "!lib/**/*.spec.*"
   ],
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./lib/index.js",
+        "types": "./lib/index.d.ts"
+      },
+      "require": {
+        "default": "./lib/cjs/index.js",
+        "types": "./lib/cjs/index.d.ts"
+      }
+    }
+  },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "jest": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.5.4"
+    "typescript": "^5.7.2"
   }
 }
