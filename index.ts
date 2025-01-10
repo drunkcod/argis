@@ -8,6 +8,8 @@ export type OmitIndex<T> = {
 	[K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
 };
 
+export type OfType<K, T> = K extends T ? K : never;
+
 export class ArgumentError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -70,4 +72,22 @@ export function intOrUndefined(x?: string | null): number | undefined {
 	if (isNil(x)) return undefined;
 	const v = Number.parseInt(x);
 	return Number.isNaN(v) ? undefined : v;
+}
+
+function filterEntries(x: null, p: (x: [string, unknown]) => boolean): null;
+function filterEntries(x: object, p: (x: [string, unknown]) => boolean): object;
+function filterEntries(x: object | null, p: (x: [string, unknown]) => boolean): object | null {
+	if (x == null) return null;
+	if (typeof x !== 'object') return x;
+	return Object.fromEntries(Object.entries(x).filter(p));
+}
+
+export function omit<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Omit<T, K> {
+	const ks: readonly string[] = keys;
+	return filterEntries(x, ([key]) => !ks.includes(key)) as any;
+}
+
+export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Pick<T, K> {
+	const ks: readonly string[] = keys;
+	return filterEntries(x, ([key]) => ks.includes(key)) as any;
 }

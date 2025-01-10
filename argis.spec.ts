@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick } from './index.js';
 
 describe('isNil', () => {
 	test('null', () => expect(isNil(null)).toBe(true));
@@ -80,4 +80,12 @@ describe('intOrUndefined', () => {
 	test('empty string', () => expect(intOrUndefined('')).toBeUndefined());
 	test('null string', () => expect(intOrUndefined(null)).toBeUndefined());
 	test('undefined string', () => expect(intOrUndefined(null)).toBeUndefined());
+});
+
+describe('omit', () => {
+	test('omit existing', () => expect(omit({ hello: 'world', number: 42 }, 'number')).toEqual({ hello: 'world' }));
+});
+
+describe('pick', () => {
+	test('pick existing', () => expect(pick({ hello: 'world', number: 42 }, 'hello')).toEqual({ hello: 'world' }));
 });
