@@ -10,6 +10,9 @@ export type OmitIndex<T> = {
 
 export type OfType<K, T> = K extends T ? K : never;
 
+export type PickOfType<T, X> = { [P in keyof T as T[P] extends X ? P : never]: T[P] };
+export type OmitOfType<T, X> = { [P in keyof T as T[P] extends X ? never : P]: T[P] };
+
 export class ArgumentError extends Error {
 	constructor(message: string) {
 		super(message);
