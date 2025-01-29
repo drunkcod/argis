@@ -1,7 +1,7 @@
 {
   "name": "@drunkcod/argis",
   "type": "module",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Tiny method arg checking with strong types.",
   "scripts": {
     "clean": "rimraf lib",
@@ -37,6 +37,6 @@
     "npm-run-all": "^4.1.5",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   }
 }
