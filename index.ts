@@ -55,18 +55,18 @@ function _hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T 
 	return Object.hasOwn(x, key);
 }
 
-export function hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K>;
-export function hasOwn<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
+export function hasOwn<T extends object, K extends PropertyKey>(x: T | unknown, key: K): x is T & WithKey<K>;
+export function hasOwn<T extends object, K extends PropertyKey, V>(x: T | unknown, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
 export function hasOwn<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V> {
 	return _hasOwn(x, key) && (ofType == undefined || ofType(x[key]));
 }
 
 function _hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K> {
-	return key in x;
+	return typeof x === 'object' && key in x;
 }
 
-export function hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K>;
-export function hasKey<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
+export function hasKey<T extends object, K extends PropertyKey>(x: T | unknown, key: K): x is T & WithKey<K>;
+export function hasKey<T extends object, K extends PropertyKey, V>(x: T | unknown, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
 export function hasKey<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V> {
 	return _hasKey(x, key) && (ofType == undefined || ofType(x[key]));
 }

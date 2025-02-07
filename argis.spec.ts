@@ -41,6 +41,19 @@ describe('hasOwn', () => {
 		const it = { answer: 42 };
 		expect(hasOwn(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
 	});
+	test('unkown', () => {
+		const value = { exists: 1 } as unknown;
+		const nonObject = 2 as unknown;
+		expect({
+			exists: hasOwn(value, 'exists'),
+			missing: hasOwn(value, 'missing'),
+			nonObject: hasOwn(nonObject, 'hello'),
+		}).toMatchObject({
+			exists: true,
+			missing: false,
+			nonObject: false,
+		});
+	});
 });
 
 describe('hasKey', () => {
@@ -58,6 +71,19 @@ describe('hasKey', () => {
 	test('with type check failing', () => {
 		const it = { answer: 42 };
 		expect(hasKey(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
+	});
+	test('unkown', () => {
+		const value = { exists: 1 } as unknown;
+		const nonObject = 2 as unknown;
+		expect({
+			exists: hasKey(value, 'exists'),
+			missing: hasKey(value, 'missing'),
+			nonObject: hasKey(nonObject, 'hello'),
+		}).toMatchObject({
+			exists: true,
+			missing: false,
+			nonObject: false,
+		});
 	});
 });
 
