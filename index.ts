@@ -61,10 +61,26 @@ export function hasOwn<T extends object, K extends PropertyKey, V = unknown>(x: 
 	return _hasOwn(x, key) && (ofType == undefined || ofType(x[key]));
 }
 
+function _hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K> {
+	return key in x;
+}
+
+export function hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K>;
+export function hasKey<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
+export function hasKey<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V> {
+	return _hasKey(x, key) && (ofType == undefined || ofType(x[key]));
+}
+
 export function assertOwn<T extends object, K extends PropertyKey>(x: T, key: K): asserts x is T & WithKey<K>;
 export function assertOwn<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): asserts x is T & WithKey<K, V>;
 export function assertOwn<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): asserts x is T & WithKey<K, V> {
 	(ofType ? hasOwn(x, key, ofType) : hasOwn(x, key)) || ArgumentError.missing({ key });
+}
+
+export function assertKey<T extends object, K extends PropertyKey>(x: T, key: K): asserts x is T & WithKey<K>;
+export function assertKey<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType: (found: unknown) => found is V): asserts x is T & WithKey<K, V>;
+export function assertKey<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): asserts x is T & WithKey<K, V> {
+	(ofType ? hasKey(x, key, ofType) : hasKey(x, key)) || ArgumentError.missing({ key });
 }
 
 export function nullIfEmpty<T extends { length: number }>(x: T | null) {

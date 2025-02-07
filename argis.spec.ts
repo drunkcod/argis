@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey } from './index.js';
 
 describe('isNil', () => {
 	test('null', () => expect(isNil(null)).toBe(true));
@@ -40,6 +40,38 @@ describe('hasOwn', () => {
 	test('with type check failing', () => {
 		const it = { answer: 42 };
 		expect(hasOwn(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
+	});
+});
+
+describe('hasKey', () => {
+	test('exists', () => {
+		expect(hasKey({ answer: 42 }, 'answer')).toBeTruthy();
+	});
+	test('missing', () => {
+		expect(hasKey({ answer: 42 }, 'message')).toBeFalsy();
+	});
+	test('with type check', () => {
+		const it = { answer: 42 };
+		expect(hasKey(it, 'answer', (x: unknown) => typeof x === 'number')).toBeTruthy();
+		//it.answer is Number.
+	});
+	test('with type check failing', () => {
+		const it = { answer: 42 };
+		expect(hasKey(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
+	});
+});
+
+describe('hasOwn vs hasKey', () => {
+	test('hasKey looks in proto', () => {
+		const x = Object.create({ message: 'hello world' });
+
+		expect({
+			hasOwn: hasOwn(x, 'message'),
+			hasKey: hasKey(x, 'message'),
+		}).toMatchObject({
+			hasOwn: false,
+			hasKey: true,
+		});
 	});
 });
 
