@@ -43,6 +43,10 @@ export function isNotNil<T, K extends keyof T>(x?: T, key?: K) {
 	return !isNil(x) && (key === undefined || !isNil(x[key]));
 }
 
+export function isThenable(x: unknown): boolean {
+	return x != null && typeof x === 'object' && 'then' in x && typeof x.then === 'function';
+}
+
 export function assertNotNil<T>(x: T | null): asserts x is T {
 	if (x == null) ArgumentError.null('Unexpected null');
 }
