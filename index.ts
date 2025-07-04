@@ -97,20 +97,14 @@ export function intOrUndefined(x?: string | null): number | undefined {
 	return Number.isNaN(v) ? undefined : v;
 }
 
-function filterEntries(x: null, p: (x: [string, unknown]) => boolean): null;
-function filterEntries(x: object, p: (x: [string, unknown]) => boolean): object;
-function filterEntries(x: object | null, p: (x: [string, unknown]) => boolean): object | null {
-	if (x == null) return null;
-	if (typeof x !== 'object') return x;
-	return Object.fromEntries(Object.entries(x).filter(p));
+function* excludeEntries(x: object, p: (value: string) => boolean) {
+	for (const k in x) if (!p(k)) yield [k, Reflect.get(x, k)] as [key: PropertyKey, value: unknown];
 }
 
 export function omit<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Omit<T, K> {
-	const ks: readonly string[] = keys;
-	return filterEntries(x, ([key]) => !ks.includes(key)) as any;
+	return Object.fromEntries(excludeEntries(x, Array.prototype.includes.bind(keys))) as any;
 }
 
 export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Pick<T, K> {
-	const ks: readonly string[] = keys;
-	return filterEntries(x, ([key]) => ks.includes(key)) as any;
+	return Object.fromEntries(keys.map((k) => [keys, x[k]])) as any;
 }

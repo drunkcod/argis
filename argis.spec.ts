@@ -141,9 +141,11 @@ describe('intOrUndefined', () => {
 });
 
 describe('omit', () => {
-	test('omit existing', () => expect(omit({ hello: 'world', number: 42 }, 'number')).toEqual({ hello: 'world' }));
+	test('own properties', () => expect(omit({ hello: 'world', number: 42 }, 'number')).toEqual({ hello: 'world' }));
+	test('from prototype', () => expect(omit(Object.create({ hello: 'world', number: 42 }), 'number')).toEqual({ hello: 'world' }));
 });
 
 describe('pick', () => {
-	test('pick existing', () => expect(pick({ hello: 'world', number: 42 }, 'hello')).toEqual({ hello: 'world' }));
+	test('own properties', () => expect(pick({ hello: 'world', number: 42 }, 'hello')).toEqual({ hello: 'world' }));
+	test('from prototype', () => expect(pick(Object.create({ hello: 'world', number: 42 }), 'hello')).toEqual({ hello: 'world' }));
 });
