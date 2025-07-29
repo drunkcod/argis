@@ -59,10 +59,29 @@ function _hasOwn<T extends object, K extends PropertyKey>(x: T, key: K): x is T 
 	return Object.hasOwn(x, key);
 }
 
+interface TypeGuard<T> {
+	(x: unknown): x is T;
+}
+
+type TypeOf = {
+	boolean: boolean;
+	number: number;
+	bigint: bigint;
+	string: string;
+	object: object;
+	symbol: symbol;
+	function: Function;
+	undefined: undefined;
+};
+
+type TypeGuardOrType<T> = T extends TypeGuard<infer V> ? TypeGuard<V> : T extends keyof TypeOf ? T : never;
+type TypeFrom<T> = T extends TypeGuard<infer V> ? V : T extends keyof TypeOf ? TypeOf[T] : never;
+
 export function hasOwn<T extends object, K extends PropertyKey>(x: T | unknown, key: K): x is T & WithKey<K>;
-export function hasOwn<T extends object, K extends PropertyKey, V>(x: T | unknown, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
-export function hasOwn<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V> {
-	return _hasOwn(x, key) && (ofType == undefined || ofType(x[key]));
+export function hasOwn<T extends object, K extends PropertyKey, V>(x: T | unknown, key: K, ofType: TypeGuard<V>): x is T & WithKey<K, V>;
+export function hasOwn<T extends object, K extends PropertyKey, V extends keyof TypeOf>(x: T | unknown, key: K, ofType: V): x is T & WithKey<K, TypeOf[V]>;
+export function hasOwn<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType?: TypeGuardOrType<V>): x is T & WithKey<K, TypeFrom<V>> {
+	return _hasOwn(x, key) && (ofType === undefined || (typeof ofType === 'string' ? typeof x[key] === ofType : ofType(x[key])));
 }
 
 function _hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T & WithKey<K> {
@@ -71,8 +90,9 @@ function _hasKey<T extends object, K extends PropertyKey>(x: T, key: K): x is T 
 
 export function hasKey<T extends object, K extends PropertyKey>(x: T | unknown, key: K): x is T & WithKey<K>;
 export function hasKey<T extends object, K extends PropertyKey, V>(x: T | unknown, key: K, ofType: (found: unknown) => found is V): x is T & WithKey<K, V>;
-export function hasKey<T extends object, K extends PropertyKey, V = unknown>(x: T, key: K, ofType?: (found: unknown) => found is V): x is T & WithKey<K, V> {
-	return _hasKey(x, key) && (ofType == undefined || ofType(x[key]));
+export function hasKey<T extends object, K extends PropertyKey, V extends keyof TypeOf>(x: T | unknown, key: K, ofType: V): x is T & WithKey<K, TypeOf[V]>;
+export function hasKey<T extends object, K extends PropertyKey, V>(x: T, key: K, ofType?: TypeGuardOrType<V>): x is T & WithKey<K, TypeFrom<V>> {
+	return _hasKey(x, key) && (ofType === undefined || (typeof ofType === 'string' ? typeof x[key] === ofType : ofType(x[key])));
 }
 
 export function assertOwn<T extends object, K extends PropertyKey>(x: T, key: K): asserts x is T & WithKey<K>;
@@ -108,3 +128,5 @@ export function omit<T extends object, K extends OfType<keyof T, string>>(x: T, 
 export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Pick<T, K> {
 	return Object.fromEntries(keys.map((k) => [keys, x[k]])) as any;
 }
+
+export { select } from './select.js';

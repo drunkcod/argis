@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey, select } from './index.js';
 
 describe('isNil', () => {
 	test('null', () => expect(isNil(null)).toBe(true));
@@ -32,9 +32,14 @@ describe('hasOwn', () => {
 	test('missing', () => {
 		expect(hasOwn({ answer: 42 }, 'message')).toBeFalsy();
 	});
-	test('with type check', () => {
+	test('type guard', () => {
 		const it = { answer: 42 };
 		expect(hasOwn(it, 'answer', (x: unknown) => typeof x === 'number')).toBeTruthy();
+		//it.answer is Number.
+	});
+	test('type check', () => {
+		const it = { answer: 42 };
+		expect(hasOwn(it, 'answer', 'number')).toBeTruthy();
 		//it.answer is Number.
 	});
 	test('with type check failing', () => {
@@ -148,4 +153,18 @@ describe('omit', () => {
 describe('pick', () => {
 	test('own properties', () => expect(pick({ hello: 'world', number: 42 }, 'hello')).toEqual({ hello: 'world' }));
 	test('from prototype', () => expect(pick(Object.create({ hello: 'world', number: 42 }), 'hello')).toEqual({ hello: 'world' }));
+});
+
+describe('select', () => {
+	test('pick & transform', () => {
+		const input = { value: 21, message: 'hello world' };
+		const r = select(input, {
+			value(x: number) {
+				return (x + x).toString();
+			},
+			message: 1,
+		}) satisfies { value: string; message: string };
+
+		expect(r).toMatchObject({ value: '42', message: 'hello world' });
+	});
 });
