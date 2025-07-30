@@ -73,6 +73,11 @@ describe('hasKey', () => {
 		expect(hasKey(it, 'answer', (x: unknown) => typeof x === 'number')).toBeTruthy();
 		//it.answer is Number.
 	});
+	test('with type check', () => {
+		const it = { answer: '42' };
+		expect(hasKey(it, 'answer', 'string')).toBeTruthy();
+		//it.answer is string.
+	});
 	test('with type check failing', () => {
 		const it = { answer: 42 };
 		expect(hasKey(it, 'answer', (x: unknown) => typeof x === 'object')).toBeFalsy();
@@ -151,7 +156,7 @@ describe('omit', () => {
 });
 
 describe('pick', () => {
-	test('own properties', () => expect(pick({ hello: 'world', number: 42 }, 'hello')).toEqual({ hello: 'world' }));
+	test('own properties', () => expect(pick({ hello: 'world', number: 42, foo: 'bar' }, 'hello', 'foo')).toEqual({ hello: 'world', foo: 'bar' }));
 	test('from prototype', () => expect(pick(Object.create({ hello: 'world', number: 42 }), 'hello')).toEqual({ hello: 'world' }));
 });
 
