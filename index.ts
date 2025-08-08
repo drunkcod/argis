@@ -120,11 +120,11 @@ function* excludeEntries(x: object, p: (value: string) => boolean) {
 }
 
 export function omit<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Omit<T, K> {
-	return Object.fromEntries(excludeEntries(x, Array.prototype.includes.bind(keys))) as any;
+	return Object.fromEntries(excludeEntries(x, Array.prototype.includes.bind(keys))) as Omit<T, K>;
 }
 
 export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, ...keys: readonly K[]): Pick<T, K> {
-	return Object.fromEntries(keys.map((k) => [k, x[k]])) as any;
+	return Object.fromEntries(keys.map((k) => [k, x[k]])) as Pick<T, K>;
 }
 
 export { select } from './select.js';
