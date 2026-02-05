@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey, select } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey, select, shapeOf } from './index.js';
 
 describe('isNil', () => {
 	test('null', () => expect(isNil(null)).toBe(true));
@@ -171,5 +171,56 @@ describe('select', () => {
 		}) satisfies { value: string; message: string };
 
 		expect(r).toMatchObject({ value: '42', message: 'hello world' });
+	});
+});
+
+describe('shapeOf', () => {
+	describe('omit', () => {
+		it('returns empty inputs', () => {
+			const x = { a: 1 };
+			const omit = shapeOf<typeof x>().omit(['a']);
+			expect(omit(null)).toBeNull();
+			expect(omit(undefined)).toBeUndefined();
+		});
+		it('omits selected properties', () => {
+			const x = {
+				a: 1,
+				b: 'hello',
+			};
+			const y: Omit<typeof x, 'a'> = shapeOf<typeof x>().omit(['a'])(x);
+			expect(y).toMatchObject({ b: 'hello' });
+		});
+	});
+	describe('pick', () => {
+		it('returns empty inputs', () => {
+			const x = { a: 1 };
+			const pick = shapeOf<typeof x>().omit(['a']);
+			expect(pick(null)).toBeNull();
+			expect(pick(undefined)).toBeUndefined();
+		});
+		it('picks selected properties', () => {
+			const x = {
+				a: 1,
+				b: 'hello',
+			};
+			const y: Pick<typeof x, 'a'> = shapeOf<typeof x>().pick(['a'])(x);
+			expect(y).toMatchObject({ a: 1 });
+		});
+	});
+	describe('pluck', () => {
+		it('returns empty inputs', () => {
+			const x = { a: 1 };
+			const pluck = shapeOf<typeof x>().pluck('a');
+			expect(pluck(null)).toBeNull();
+			expect(pluck(undefined)).toBeUndefined();
+		});
+		it('picks selected properties', () => {
+			const x = {
+				a: 1,
+				b: 'hello',
+			};
+			const y: (typeof x)['a'] = shapeOf<typeof x>().pluck('a')(x);
+			expect(y).toEqual(x.a);
+		});
 	});
 });
