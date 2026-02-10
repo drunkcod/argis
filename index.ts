@@ -128,4 +128,3 @@ export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, 
 }
 
 export { select } from './select.js';
-export { shapeOf } from './shapeOf.js';
