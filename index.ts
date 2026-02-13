@@ -128,3 +128,4 @@ export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, 
 }
 
 export { select } from './select.js';
+export type { Json } from './Json.js';

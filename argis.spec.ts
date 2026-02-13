@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey, select, shapeOf } from './index.js';
+import { ArgumentError, argNotNil, isNil, isNotNil, assertOwn, assertNotNil, intOrUndefined, hasOwn, omit, pick, hasKey, select } from './index.js';
 
 describe('isNil', () => {
 	test('null', () => expect(isNil(null)).toBe(true));
