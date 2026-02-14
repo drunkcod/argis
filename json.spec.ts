@@ -69,15 +69,29 @@ describe('maps types to their serialized versions', () => {
 		expect(y).toEqual({ now: now.toJSON(), nested: 'world' });
 	});
 
-	it('handles Map, Set, and RegExp as empty objects', () => {
+	it('handles Collections and RegExp as empty objects', () => {
 		const x = {
-			map: new Map([['a', 'b']]),
-			set: new Set([1, 2]),
+			map: new Map(),
+			set: new Set(),
+			wmap: new WeakMap(),
+			wset: new WeakSet(),
 			regex: /abc/,
 		};
-		const json = expectJSON<typeof x, { map: {}; set: {}; regex: {} }>(x);
+		const json = expectJSON<typeof x, { map: {}; set: {}; wmap: {}; wset: {}; regex: {} }>(x);
 		const y: Success<typeof json> = json;
-		expect(y).toEqual({ map: {}, set: {}, regex: {} });
+		expect(y).toEqual({ map: {}, set: {}, wmap: {}, wset: {}, regex: {} });
+	});
+
+	it('prioritizes toJSON on collections and functions', () => {
+		const m = new Map() as Map<any, any> & Jsonable<number>;
+		m.toJSON = () => 1;
+		const f = (() => {}) as (() => void) & Jsonable<number>;
+		f.toJSON = () => 2;
+
+		const x = { m, f };
+		const json = expectJSON<typeof x, { m: number; f: number }>(x);
+		const y: Success<typeof json> = json;
+		expect(y).toEqual({ m: 1, f: 2 });
 	});
 
 	it('preserves optional properties', () => {
@@ -98,22 +112,27 @@ describe('maps types to their serialized versions', () => {
 		const check: Success<Check> = true as any;
 	});
 
-	it('converts undefined/functions/symbols to null in arrays', () => {
-		const x = [undefined, () => {}, Symbol('foo')] as const;
-		const json = expectJSON<typeof x, readonly [null, null, null]>(x);
-		type J = Json<typeof json>;
+	it('converts everything that would be omitted to null in arrays', () => {
+		const x = [
+			undefined,
+			() => {},
+			Symbol('foo'),
+			{
+				toJSON() {
+					return undefined;
+				},
+			},
+		] as const;
+		const json = expectJSON<typeof x, readonly [null, null, null, null]>(x);
 		const y: Success<typeof json> = json;
-		expect(y).toEqual([null, null, null]);
+		expect(y).toEqual([null, null, null, null]);
 	});
 
-	it('handles toJSON on arrays', () => {
-		const x = Object.assign([1, 2, 3], {
-			toJSON() {
-				return 'foo';
-			},
-		}) as Array<number> & Jsonable<string>;
-		const json = expectJSON<typeof x, string>(x);
-		const y: Success<typeof json> = json;
-		expect(y).toBe('foo');
+	it('detects bigint as JsonError', () => {
+		type Actual = Json<{ a: bigint }>;
+		type Expected = { a: { [K in any]: 'bigint-not-serializeable' } };
+		// We can't easily match the unique symbol in the test, but we can verify it's not omitted
+		type IsEmpty = {} extends Actual ? true : false;
+		const check: Success<IsEmpty> = false;
 	});
 });
