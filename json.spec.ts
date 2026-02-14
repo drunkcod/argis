@@ -2,8 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import type { Json, Jsonable } from './Json.js';
 
 describe('maps types to their serialized versions', () => {
-	// prettier-ignore
-	type ExpectFail = [never]
+	type ExpectFail = [never];
 	type Expect<Expected, Actual> = Expected extends Actual ? (Actual extends Expected ? Expected : ExpectFail) : ExpectFail;
 	type Success<T> = T extends ExpectFail ? 'expect-failed' : T;
 
