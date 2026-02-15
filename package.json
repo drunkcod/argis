@@ -1,8 +1,8 @@
 {
   "name": "@drunkcod/argis",
   "type": "module",
-  "version": "0.0.13",
-  "description": "Tiny method arg checking with strong types.",
+  "version": "0.0.14",
+  "description": "A tiny, type-first toolkit for runtime argument validation and structural object utilities.",
   "scripts": {
     "clean": "rimraf lib",
     "compile": "tsc",
