@@ -1,5 +1,5 @@
 import { describe, it, test } from '@jest/globals';
-import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional } from './TypeUtils.js';
+import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional } from '../TypeUtils.js';
 
 describe('TypeUtils', () => {
 	type ExpectMatches<A, B> = A extends B ? (B extends A ? true : false) : false;

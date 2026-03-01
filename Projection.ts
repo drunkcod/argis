@@ -1,4 +1,4 @@
-import { IsAny } from 'TypeUtils.js';
+import { IsAny, IsUnknown } from 'TypeUtils.js';
 
 type Split<X extends string> = X extends `${infer H}.${infer R}` ? [H, R] : [X, never];
 
@@ -8,7 +8,7 @@ const PROJECTION_ERROR: unique symbol = Symbol('ProjectionError');
 export type ProjectionError<T extends string> = { readonly [PROJECTION_ERROR]: T };
 
 const PROJECTION_TYPE: unique symbol = Symbol('ProjectionType');
-export type ProjectionType<T extends 0 | 1, P> = { readonly [PROJECTION_TYPE]: T; P: P };
+type ProjectionType<T extends 0 | 1, P> = { readonly [PROJECTION_TYPE]: T; P: P };
 
 type Leafs<T> = T extends object ? { [K in keyof T]: Leafs<T[K]> }[keyof T] : T;
 type Errors<T> = T extends ProjectionError<any> ? T : T extends object ? { [K in keyof T]: Errors<T[K]> }[keyof T] : never;
@@ -29,7 +29,7 @@ type Squish<T> = T extends object ? { [P in keyof T]: Squish<UnionToIntersection
 type _EnsureValidProjection<Leafs, Ok> =
 	[Leafs] extends [1] ? ProjectionType<1, Ok> :
 	[Leafs] extends [0] ? ProjectionType<0, Ok> :
-	ProjectionError<'ERROR: Cannot mix inclusiton (1) with exlcustion (0)'>;
+	ProjectionError<'ERROR: Projections can only include *either* inclusions (1) or exclusions(0)'>;
 type EnsureValidProjection<P> = _EnsureValidProjection<Leafs<P>, P>;
 
 type UnwrapProjection<T> = T extends ProjectionType<any, infer P> ? P : T;
@@ -42,12 +42,12 @@ type _ProjectInclusion<T, P> =
 	T extends (infer U)[] ? _ProjectInclusion<U, P>[] :
 	{ [K in keyof T as K extends keyof P ? K : never]: K extends keyof P ? _ProjectInclusion<T[K], P[K]> : never };
 
-type _ProjectExclusion<T, P> = {
-	[K in keyof T as K extends keyof P ? (P[K] extends 0 ? never : K) : K]: K extends keyof P ? _ProjectExclusion<T[K], P[K]> : T[K];
-};
+type _ProjectExclusion<T, P> = T extends (infer U)[]
+	? _ProjectExclusion<U, P>[]
+	: { [K in keyof T as K extends keyof P ? (P[K] extends 0 ? never : K) : K]: K extends keyof P ? _ProjectExclusion<T[K], P[K]> : T[K] };
 
 // prettier-ignore
-export type _ProjectParsed<T, P> =
+type _ProjectParsed<T, P> =
 	P extends ProjectionType<1, infer Inclusion> ? _ProjectInclusion<T, Inclusion> :
 	P extends ProjectionType<0, infer Exclusion> ? _ProjectExclusion<T, Exclusion> :
 	ProjectionError<`ERROR: Unknown Projection type.`>;
@@ -57,5 +57,10 @@ type _ParsedProjection<T> = EnsureValidProjection<Squish<Splut<T>>>;
 // prettier-ignore
 export type Projection<T> = EnsureNoError<UnwrapProjection<_ParsedProjection<T>>>;
 
-type Ungarbage<T, P> = {} extends P ? (IsAny<T> extends true ? T : P) : P;
+/**
+ * Ungarbage is a post-processor that detects if a projection has collapsed into
+ * an empty object (common when mapping over 'any' or 'unknown') and restores
+ * the original input type if the input was 'any' or 'unknown'.
+ */
+type Ungarbage<T, P> = {} extends P ? (IsAny<T> extends true ? T : IsUnknown<T> extends true ? T : P) : P;
 export type Projected<T, P> = Ungarbage<T, _ProjectParsed<T, _ParsedProjection<P>>>;

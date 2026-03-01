@@ -1,6 +1,6 @@
 import { describe, it } from '@jest/globals';
-import { _ProjectParsed, Projected, Projection, ProjectionError, ProjectionType } from './Projection.js';
-import { IsAny } from './TypeUtils.js';
+import { Projected, Projection, ProjectionError } from '../Projection.js';
+import { IsAny } from '../TypeUtils.js';
 
 type IsError<T> = T extends ProjectionError<any> ? true : false;
 type ExpectFail = [never];
@@ -86,6 +86,14 @@ describe('Projected is the resulting type', () => {
 		type Input = { items: { name: string; age: number }[] };
 		type Result = Projected<Input, { 'items.name': 1 }>;
 		type Expected = { items: { name: string }[] };
+
+		const check: ExpectSame<Expected, Result> = true;
+	});
+
+	it('handles arrays with exclusion', () => {
+		type Input = { items: { name: string; age: number }[] };
+		type Result = Projected<Input, { 'items.name': 0 }>;
+		type Expected = { items: { age: number }[] };
 
 		const check: ExpectSame<Expected, Result> = true;
 	});

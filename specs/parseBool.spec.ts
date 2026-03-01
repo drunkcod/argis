@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from '@jest/globals';
-import { isBool, parseBool } from './parseBool.js';
+import { isBool, parseBool } from '../parseBool.js';
 
 describe('parseBool', () => {
 	const boolsy = [

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import type { Json, Jsonable } from './Json.js';
+import type { Json, Jsonable } from '../Json.js';
 
 describe('Json<T> maps types to their serialized versions', () => {
 	type ExpectFail = [never];
