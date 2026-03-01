@@ -99,7 +99,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Actual = Json<Input>;
 
 		type Check = Expect<Actual, Expected>;
-		const check: Success<Check> = true as any;
+		const check: Success<Check> = { a: '', b: 0 };
 	});
 
 	it('handles tuples and preserves structure', () => {
@@ -108,7 +108,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Actual = Json<Input>;
 
 		type Check = Expect<Actual, Expected>;
-		const check: Success<Check> = true as any;
+		const check: Success<Check> = ['', 0];
 	});
 
 	it('converts everything that would be omitted to null in arrays', () => {

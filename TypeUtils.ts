@@ -1,4 +1,4 @@
-type Pretty<T> = { [P in keyof T]: T[P] } & {};
+export type Pretty<T> = { [P in keyof T]: T[P] } & {};
 
 const SPECIAL_TAG: unique symbol = Symbol('');
 type SpecialTag<T> = { readonly [SPECIAL_TAG]: T };
@@ -35,6 +35,8 @@ type UnwrapTags<T> = UnwrapTagsCore<UnwrapOptional<T>>;
 type UnionMergeCore<A, B> = {
 	[K in keyof A | keyof B]: (K extends keyof A ? A[K] : TagOptional) | (K extends keyof B ? B[K] : TagOptional);
 };
+
+export type Assign<Target, Source> = Omit<Target, keyof Source> & Source;
 
 export type UnionMerge<A, B> = Pretty<UnwrapTags<UnionMergeCore<TagSpecial<A>, TagSpecial<B>>>>;
 
