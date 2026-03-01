@@ -1,14 +1,10 @@
 import { describe, it } from '@jest/globals';
-import { Projected, Projection, ProjectionError } from '../Projection.js';
-import { IsAny } from '../TypeUtils.js';
+import type { ExpectSame } from './ExpectSame.js';
+import type { Projected, Projection, ProjectionError } from '../Projection.js';
 
 type IsError<T> = T extends ProjectionError<any> ? true : false;
 type ExpectFail = [never];
 type Expect<Expected, Actual> = Expected extends Actual ? (Actual extends Expected ? Expected : ExpectFail) : ExpectFail;
-
-// any-aware ExpectSame
-type ExpectSame<Expected, Actual> =
-	IsAny<Expected> extends true ? IsAny<Actual> : IsAny<Actual> extends true ? false : Expected extends Actual ? (Actual extends Expected ? true : false) : false;
 
 type Success<T> = T extends ExpectFail ? 'expect-failed' : T;
 
