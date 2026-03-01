@@ -129,5 +129,6 @@ export function pick<T extends object, K extends OfType<keyof T, string>>(x: T, 
 
 export { select } from './select.js';
 export { parseBool, isBool } from './parseBool.js';
+export type { Projection, Projected, ProjectionError } from './Projection.js';
 export type { Json } from './Json.js';
 export type * from './TypeUtils.js';
