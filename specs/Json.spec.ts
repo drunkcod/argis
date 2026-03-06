@@ -37,6 +37,14 @@ describe('Json<T> maps types to their serialized versions', () => {
 		expect(y.items).toEqual(x.items);
 	});
 
+	it('keeps indexers', () => {
+		const x: {
+			[key in `hello_${string}`]?: { value: number };
+		} = {};
+		const y: Json<typeof x> = x;
+		const check: ExpectSame<Json<typeof x>, typeof x> = true;
+	});
+
 	it('excludes undefined and functions', () => {
 		const x = {
 			fn() {},

@@ -8,26 +8,28 @@ type TagUnknown = SpecialTag<'unknown'>;
 
 export type IsAny<T> = 0 extends 1 & T ? true : false;
 export type IsUnknown<T> = unknown extends T ? (IsAny<T> extends true ? false : true) : false;
-export type IsOptional<T, K extends keyof T> = { [P in K]?: T[K] } extends Pick<T, K> ? true : false;
+export type IsOptional<T, K extends keyof T> = IfOptional<T, K, true, false>;
+
+export type IfOptional<T, K extends keyof T, True, False> = { [P in K]?: T[K] } extends Pick<T, K> ? True : False;
 
 // prettier-ignore
 type TagSpecial<T> = {
 	[P in keyof T]: 
-		(IsOptional<T, P> extends true ? TagOptional : never) |
+		IfOptional<T, P, TagOptional, never> |
 		(IsAny<T[P]> extends true ? TagAny :
 		IsUnknown<T[P]> extends true ? TagUnknown :
 		T[P]);
 };
 
-type IsTagged<T, X extends SpecialTag<any>> = [Extract<T, X>] extends [never] ? false : true;
+type IfTagged<T, X extends SpecialTag<any>, True, False> = [Extract<T, X>] extends [never] ? False : True;
 
 // prettier-ignore
 type UnwrapOptional<T> =
-	{ [P in keyof T as IsTagged<T[P], TagOptional> extends false ? P : never]: T[P] } & 
-	{ [P in keyof T as IsTagged<T[P], TagOptional> extends true ? P : never]?: Exclude<T[P], TagOptional> };
+	{ [P in keyof T as IfTagged<T[P], TagOptional, never, P>]: T[P] } & 
+	{ [P in keyof T as IfTagged<T[P], TagOptional, P, never>]?: Exclude<T[P], TagOptional> };
 
 type UnwrapTagsCore<T> = {
-	[P in keyof T]: IsTagged<T[P], TagAny> extends true ? any : IsTagged<T[P], TagUnknown> extends true ? unknown : T[P];
+	[P in keyof T]: IfTagged<T[P], TagAny, any, IfTagged<T[P], TagUnknown, unknown, T[P]>>;
 };
 
 type UnwrapTags<T> = UnwrapTagsCore<UnwrapOptional<T>>;
@@ -40,4 +42,4 @@ export type Assign<Target, Source> = Omit<Target, keyof Source> & Source;
 
 export type UnionMerge<A, B> = Pretty<UnwrapTags<UnionMergeCore<TagSpecial<A>, TagSpecial<B>>>>;
 
-export type PickRequired<T> = { [P in keyof T as IsOptional<T, P> extends true ? never : P]: T[P] };
+export type PickRequired<T> = { [P in keyof T as IfOptional<T, P, never, P>]: T[P] };
