@@ -19,8 +19,8 @@ type JsonObject<T> =
 
 // prettier-ignore
 type _Json<T, IsRoot = true> = 
-	T extends TagCycle<infer X> ? JsonError<'cycle-detected', X> : 
-	T extends Jsonable<infer J> ? (IsRoot extends true ? _Json<J, false> : _Json<Omit<T, 'toJSON'>>) : 
+	T extends TagCycle<infer X> ? (X extends Jsonable<infer J> ? _Json<TagCycles<J>, false> : JsonError<'cycle-detected', X>) : 
+	T extends Jsonable<infer J> ? (IsRoot extends true ? _Json<TagCycles<J>, false> : _Json<Omit<T, 'toJSON'>>) : 
 	T extends NeverJson ? never :
 	T extends EmptyJson ? Record<string, never> :
 	T extends bigint ? JsonError<'bigint-not-serializeable'> :

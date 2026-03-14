@@ -1,4 +1,4 @@
-import { IsAny } from '../TypeUtils';
+import { IsAny } from '../TypeUtils.js';
 
 // any-aware ExpectSame
 export type ExpectSame<Expected, Actual> =

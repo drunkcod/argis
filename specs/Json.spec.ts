@@ -148,6 +148,26 @@ describe('Json<T> maps types to their serialized versions', () => {
 		const r: ExpectSame<A, { y: { x: JsonError<'cycle-detected', X> } }> = true;
 	});
 
+	it('breaks cycles if toJSON is encountered', () => {
+		type A = { b: B; toJSON(): string };
+		type B = { a: A };
+
+		type Result = Pretty<Json<B>>;
+		const r: ExpectSame<Result, { a: string }> = true;
+	});
+
+	it('detects cycles when toJSON returns a circular structure', () => {
+		type A = { b: B };
+		type B = { a: A };
+		type Node = { toJSON(): A };
+
+		type Result = Pretty<Json<Node>>;
+		type A_Prop = Result['b']['a'];
+
+		type IsError = A_Prop extends JsonError<'cycle-detected', any> ? true : false;
+		const check: IsError = true;
+	});
+
 	it('detects bigint as JsonError', () => {
 		type Actual = Json<{ a: bigint }>;
 		type Expected = { a: { [K in any]: 'bigint-not-serializeable' } };
