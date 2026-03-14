@@ -9,7 +9,8 @@
     "cjs:compile": "tsc --module commonjs --outdir lib/cjs",
     "cjs:fixup": "echo '{\"type\": \"commonjs\"}' > lib/cjs/package.json",
     "build": "npm-run-all clean -p compile cjs:compile -s cjs:fixup --silent",
-    "test": "node --experimental-vm-modules --disable-warning=ExperimentalWarning node_modules/jest/bin/jest.js",
+    "test": "run-s test:typecheck test:run",
+    "test:run": "node --experimental-vm-modules --disable-warning=ExperimentalWarning node_modules/jest/bin/jest.js",
     "test:typecheck": "tsc --project tsconfig.test.json --noEmit"
   },
   "author": "Tobbe Gyllebring",

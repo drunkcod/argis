@@ -60,3 +60,14 @@ export type Assign<Target, Source> = Omit<Target, keyof Source> & Source;
 export type UnionMerge<A, B> = Pretty<UnwrapTags<UnionMergeCore<TagSpecial<A>, TagSpecial<B>>>>;
 
 export type PickRequired<T> = { [P in keyof T as IfOptional<T, P, never, P>]: T[P] };
+
+// prettier-ignore
+export type Substitute<T, Target, Replacement> = 
+	IsIdentical<T, Target> extends true ? Replacement :
+	T extends SpecialTag<any> ? T :
+	IsAny<T> extends true ? T :
+	IsUnknown<T> extends true ? T :
+	IsFn<T> extends true ? T :
+	T extends readonly any[] ? { [K in keyof T]: Substitute<T[K], Target, Replacement> } :
+	T extends object ? Pretty<UnwrapTags<{ [P in keyof TagSpecial<T>]: Substitute<TagSpecial<T>[P], Target, Replacement> }>> :
+	T;
