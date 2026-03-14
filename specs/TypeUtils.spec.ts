@@ -83,5 +83,11 @@ describe('TypeUtils', () => {
 			type A = TagCycles<Node>;
 			const r: ExpectSame<A, Node> = true;
 		});
+
+		it('supports optionality', () => {
+			type Node = { value: number; next?: Node };
+			type A = TagCycles<Node>;
+			const r: ExpectSame<A, { value: number; next: TagCycle<Node> }> = true;
+		});
 	});
 });
