@@ -1,5 +1,5 @@
 import { describe, it, test } from '@jest/globals';
-import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional, TagCycles, TagCycle, IsFn } from '../TypeUtils.js';
+import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional, TagCycles, TagCycle, IsFn, TagSpecial, IsVisited, IsIdentical } from '../TypeUtils.js';
 import { ExpectSame } from './ExpectSame.js';
 
 describe('TypeUtils', () => {
@@ -88,6 +88,7 @@ describe('TypeUtils', () => {
 				unknown: unknown;
 				undefined: undefined;
 			};
+			type T = TagSpecial<Node>;
 			type A = TagCycles<Node>;
 			const r: ExpectSame<A, Node> = true;
 		});
@@ -105,10 +106,29 @@ describe('TypeUtils', () => {
 			const r: ExpectSame<A, { y: { x: TagCycle<X> } }> = true;
 		});
 
+		it('handles tuples', () => {
+			type Input = [string, number];
+			type A = TagCycles<Input>;
+			const r: ExpectSame<A, Input> = true;
+		});
+
 		it('handles complex indexers (since those usually fall of the rails)', () => {
-			type Node = { [x in `hello_${string}`]: Node };
+			type NodeData = { value: number };
+			type Node = { [x in `hello_${string}`]?: NodeData };
+			type K = keyof Node;
+			type T = TagSpecial<Node>;
 			type A = TagCycles<Node>;
-			const r: ExpectSame<A, { [x in `hello_${string}`]: TagCycle<Node> }> = true;
+			type Id = IsIdentical<NodeData, Node>;
+			type V = IsVisited<NodeData, Node>;
+			const r: ExpectSame<A, { [x in `hello_${string}`]?: { value: number } }> = true;
+		});
+
+		it('handles complex indexers (since those usually fall of the rails)', () => {
+			type Node = { [x in `hello_${string}`]?: Node };
+			type K = keyof Node;
+			type T = TagSpecial<Node>;
+			type A = TagCycles<Node>;
+			const r: ExpectSame<A, { [x in `hello_${string}`]?: TagCycle<Node> }> = true;
 		});
 	});
 });

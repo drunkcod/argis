@@ -17,7 +17,7 @@ export type IsOptional<T, K extends keyof T> = IfOptional<T, K, true, false>;
 export type IfOptional<T, K extends keyof T, True, False> = { [P in K]?: T[K] } extends Pick<T, K> ? True : False;
 
 // prettier-ignore
-type TagSpecial<T> = {
+export type TagSpecial<T> = {
 	[P in keyof T]: 
 		IfOptional<T, P, TagOptional, never> |
 		(IsAny<T[P]> extends true ? TagAny :
@@ -25,14 +25,21 @@ type TagSpecial<T> = {
 		T[P]);
 };
 
+export type IsIdentical<T, V> = [T] extends [V] ? ([V] extends [T] ? true : false) : false;
+export type HasIdentical<T, U> = true extends (U extends any ? IsIdentical<T, U> : false) ? true : false;
+
+export type HasVisited<T, Visited> = [NonNullable<T>] extends [Visited] ? true : false;
+export type IsVisited<T, Visited> = HasVisited<T, Visited> extends true ? (HasIdentical<T, Visited> extends true ? true : false) : false;
 // prettier-ignore
-export type TagCycles<T, Visited = never> = 
-	IsAny<T> extends true ? any :
+type _TagCycles<T, Visited> = 
+	T extends SpecialTag<any> ? T :
 	IsFn<T> extends true ? T :
 	T extends undefined ? undefined :
-	[NonNullable<T>] extends [Visited] ? TagCycle<NonNullable<T>> :
-	T extends object ? { [P in keyof T]: TagCycles<T[P], Visited | T> } :
+	IsVisited<T, Visited> extends true ? TagCycle<NonNullable<T>> :
+	T extends object ? { [P in keyof T]: _TagCycles<T[P], Visited | NonNullable<T>> } :
 	T;
+
+export type TagCycles<T> = _TagCycles<T, never>;
 
 type IfTagged<T, X extends SpecialTag<any>, True, False> = [Extract<T, X>] extends [never] ? False : True;
 

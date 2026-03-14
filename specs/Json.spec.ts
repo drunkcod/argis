@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
-import type { Json, Jsonable } from '../Json.js';
+import type { Json, Jsonable, JsonError } from '../Json.js';
 import { ExpectSame } from './ExpectSame.js';
-import { Pretty } from '../TypeUtils.js';
+import { Pretty, TagCycles } from '../TypeUtils.js';
 
 describe('Json<T> maps types to their serialized versions', () => {
 	type ExpectFail = [never];
@@ -42,7 +42,10 @@ describe('Json<T> maps types to their serialized versions', () => {
 		const x: {
 			[key in `hello_${string}`]?: { value: number };
 		} = {};
-		const y: Json<typeof x> = x;
+		type X = typeof x;
+		type T = Pretty<TagCycles<X>>;
+		type J = Json<X>;
+		const y: Json<X> = x;
 		const check: ExpectSame<Json<typeof x>, typeof x> = true;
 	});
 
@@ -142,7 +145,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Y = { x: X };
 		type A = Json<X>;
 
-		const r: ExpectSame<A, {}> = true;
+		const r: ExpectSame<A, { y: { x: JsonError<'cycle-detected', X> } }> = true;
 	});
 
 	it('detects bigint as JsonError', () => {
