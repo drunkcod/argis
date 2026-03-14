@@ -28,18 +28,15 @@ export type TagSpecial<T> = {
 export type IsIdentical<T, V> = [T] extends [V] ? ([V] extends [T] ? true : false) : false;
 export type HasIdentical<T, U> = true extends (U extends any ? IsIdentical<T, U> : false) ? true : false;
 
-export type HasVisited<T, Visited> = [NonNullable<T>] extends [Visited] ? true : false;
-export type IsVisited<T, Visited> = HasVisited<T, Visited> extends true ? (HasIdentical<T, Visited> extends true ? true : false) : false;
+export type IsVisited<T, Visited> = [NonNullable<T>] extends [Visited] ? HasIdentical<T, Visited> : false;
 // prettier-ignore
-type _TagCycles<T, Visited> = 
+export type TagCycles<T, Visited = never> = 
 	T extends SpecialTag<any> ? T :
 	IsFn<T> extends true ? T :
 	T extends undefined ? undefined :
 	IsVisited<T, Visited> extends true ? TagCycle<NonNullable<T>> :
-	T extends object ? { [P in keyof T]: _TagCycles<T[P], Visited | NonNullable<T>> } :
+	T extends object ? { [P in keyof T]: TagCycles<T[P], Visited | NonNullable<T>> } :
 	T;
-
-export type TagCycles<T> = _TagCycles<T, never>;
 
 type IfTagged<T, X extends SpecialTag<any>, True, False> = [Extract<T, X>] extends [never] ? False : True;
 
