@@ -87,7 +87,20 @@ describe('TypeUtils', () => {
 		it('supports optionality', () => {
 			type Node = { value: number; next?: Node };
 			type A = TagCycles<Node>;
-			const r: ExpectSame<A, { value: number; next: TagCycle<Node> }> = true;
+			const r: ExpectSame<A, { value: number; next?: TagCycle<Node> }> = true;
+		});
+
+		it('detects indirect cycles', () => {
+			type X = { y: Y };
+			type Y = { x: X };
+			type A = TagCycles<X>;
+			const r: ExpectSame<A, { y: { x: TagCycle<X> } }> = true;
+		});
+
+		it('handles complex indexers (since those usually fall of the rails)', () => {
+			type Node = { [x in `hello_${string}`]: Node };
+			type A = TagCycles<Node>;
+			const r: ExpectSame<A, { [x in `hello_${string}`]: TagCycle<Node> }> = true;
 		});
 	});
 });
