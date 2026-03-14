@@ -1,5 +1,5 @@
 import { describe, it, test } from '@jest/globals';
-import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional } from '../TypeUtils.js';
+import { UnionMerge, PickRequired, IsAny, IsUnknown, IsOptional, TagCycles, TagCycle, IsFn } from '../TypeUtils.js';
 import { ExpectSame } from './ExpectSame.js';
 
 describe('TypeUtils', () => {
@@ -69,5 +69,19 @@ describe('TypeUtils', () => {
 		type T = { a: string; b?: number; c: boolean | undefined };
 		type R = PickRequired<T>;
 		const r: ExpectSame<R, { a: string; c: boolean | undefined }> = true;
+	});
+
+	test('TagCycles', () => {
+		it('detects direct cycle', () => {
+			type Node = { value: number; next: Node };
+			type A = TagCycles<Node>;
+			const r: ExpectSame<A, { value: number; next: TagCycle<Node> }> = true;
+		});
+
+		it('keeps primivites, any and unknown', () => {
+			type Node = { number: number; string: string; fn: () => void; any: any; unknown: unknown };
+			type A = TagCycles<Node>;
+			const r: ExpectSame<A, Node> = true;
+		});
 	});
 });

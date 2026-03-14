@@ -7,7 +7,10 @@ type TagOptional = SpecialTag<'?'>;
 type TagUnknown = SpecialTag<'unknown'>;
 export type TagCycle<T> = SpecialTag<'cycle', T>;
 
+export type AnyFn = (...args: any[]) => any;
+
 export type IsAny<T> = 0 extends 1 & T ? true : false;
+export type IsFn<T> = T extends AnyFn ? true : false;
 export type IsUnknown<T> = unknown extends T ? (IsAny<T> extends true ? false : true) : false;
 export type IsOptional<T, K extends keyof T> = IfOptional<T, K, true, false>;
 
@@ -24,6 +27,8 @@ type TagSpecial<T> = {
 
 // prettier-ignore
 export type TagCycles<T, Visited = never> = 
+	IsAny<T> extends true ? any :
+	IsFn<T> extends true ? T :
 	[T] extends [Visited] ? TagCycle<T> :
 	T extends object ? { [P in keyof T]: TagCycles<T[P], Visited | T> } :
 	T;

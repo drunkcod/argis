@@ -1,10 +1,9 @@
-import { IfOptional } from './TypeUtils.js';
+import { AnyFn, IfOptional } from './TypeUtils.js';
 
 export interface Jsonable<Json> {
 	toJSON(): Json;
 }
 
-type AnyFn = (...args: any[]) => any;
 type NeverJson = undefined | symbol | AnyFn;
 type EmptyJson = Map<any, any> | Set<any> | WeakMap<any, any> | WeakSet<any> | RegExp;
 
