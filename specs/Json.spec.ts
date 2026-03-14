@@ -1,6 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
 import type { Json, Jsonable } from '../Json.js';
 import { ExpectSame } from './ExpectSame.js';
+import { Pretty } from '../TypeUtils.js';
 
 describe('Json<T> maps types to their serialized versions', () => {
 	type ExpectFail = [never];
@@ -129,9 +130,19 @@ describe('Json<T> maps types to their serialized versions', () => {
 				},
 			},
 		] as const;
+		type X = typeof x;
+		type J = Json<X>;
 		const json = expectJSON<typeof x, readonly [null, null, null, null]>(x);
 		const y: Success<typeof json> = json;
 		expect(y).toEqual([null, null, null, null]);
+	});
+
+	it('detects cycles', () => {
+		type X = { y: Y };
+		type Y = { x: X };
+		type A = Json<X>;
+
+		const r: ExpectSame<A, {}> = true;
 	});
 
 	it('detects bigint as JsonError', () => {

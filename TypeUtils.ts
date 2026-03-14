@@ -29,6 +29,7 @@ type TagSpecial<T> = {
 export type TagCycles<T, Visited = never> = 
 	IsAny<T> extends true ? any :
 	IsFn<T> extends true ? T :
+	T extends undefined ? undefined :
 	[NonNullable<T>] extends [Visited] ? TagCycle<NonNullable<T>> :
 	T extends object ? { [P in keyof T]: TagCycles<T[P], Visited | T> } :
 	T;

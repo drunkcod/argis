@@ -1,4 +1,4 @@
-import { AnyFn, IfOptional } from './TypeUtils.js';
+import { AnyFn, IfOptional, Pretty, TagCycle, TagCycles } from './TypeUtils.js';
 
 export interface Jsonable<Json> {
 	toJSON(): Json;
@@ -14,15 +14,18 @@ type JsonProperty<T, P extends keyof T> = P extends string | number ? (Json<T[P]
 
 // prettier-ignore
 type JsonObject<T> = 
-	{ [P in keyof T as IfOptional<T, P, never, JsonProperty<T, P>>]: Json<T[P]> } & 
-	{ [P in keyof T as IfOptional<T, P, JsonProperty<T, P>, never>]?: Json<T[P]> };
+	{ [P in keyof T as IfOptional<T, P, never, JsonProperty<T, P>>]: _Json<T[P]> } & 
+	{ [P in keyof T as IfOptional<T, P, JsonProperty<T, P>, never>]?: _Json<T[P]> };
 
 // prettier-ignore
-export type Json<T, IsRoot = true> = 
-	T extends Jsonable<infer J> ? (IsRoot extends true ? Json<J, false> : Json<Omit<T, 'toJSON'>>) : 
+type _Json<T, IsRoot = true> = 
+	T extends TagCycle<infer X> ? JsonError<'cycle-detected'> : 
+	T extends Jsonable<infer J> ? (IsRoot extends true ? _Json<J, false> : _Json<Omit<T, 'toJSON'>>) : 
 	T extends NeverJson ? never :
 	T extends EmptyJson ? Record<string, never> :
 	T extends bigint ? JsonError<'bigint-not-serializeable'> :
-	T extends readonly any[] ? { [I in keyof T]: [Json<T[I]>] extends [never] ? null : Json<T[I]> } :
+	T extends readonly any[] ? { [I in keyof T]: [_Json<T[I]>] extends [never] ? null : _Json<T[I]> } :
 	T extends object ? JsonObject<T> : 
 	T;
+
+export type Json<T, IsRoot = true> = Pretty<_Json<TagCycles<T>, IsRoot>>;

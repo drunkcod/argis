@@ -79,7 +79,15 @@ describe('TypeUtils', () => {
 		});
 
 		it('keeps primivites, any and unknown', () => {
-			type Node = { number: number; string: string; fn: () => void; any: any; unknown: unknown };
+			type Node = {
+				number: number;
+				string: string;
+				symbol: symbol;
+				fn: () => void;
+				any: any;
+				unknown: unknown;
+				undefined: undefined;
+			};
 			type A = TagCycles<Node>;
 			const r: ExpectSame<A, Node> = true;
 		});
