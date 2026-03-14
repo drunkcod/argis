@@ -25,7 +25,7 @@ export type TagSpecial<T> = {
 		T[P]);
 };
 
-export type IsIdentical<T, V> = [T] extends [V] ? ([V] extends [T] ? true : false) : false;
+export type IsIdentical<T, V> = IsAny<T> extends true ? IsAny<V> : [T] extends [V] ? ([V] extends [T] ? true : false) : false;
 export type HasIdentical<T, U> = true extends (U extends any ? IsIdentical<T, U> : false) ? true : false;
 
 export type IsVisited<T, Visited> = [NonNullable<T>] extends [Visited] ? HasIdentical<T, Visited> : false;
