@@ -1,12 +1,14 @@
 export type Pretty<T> = T extends object ? { [P in keyof T]: T[P] } & {} : T;
 export type Optional<T, K extends keyof T> = Pretty<Omit<T, K> & Partial<Pick<T, K>>>;
 
-const SPECIAL_TAG: unique symbol = Symbol('');
-type SpecialTag<T, Data = never> = { readonly [SPECIAL_TAG]: T; data: Data };
+export type Tagged<Sym extends symbol, T, Data = {}> = Pretty<Readonly<Record<Sym, T>> & Data>;
+
+const SpecialTag: unique symbol = Symbol('SpecialTag');
+type SpecialTag<T, Data = {}> = Tagged<typeof SpecialTag, T, Data>;
 type TagAny = SpecialTag<'any'>;
 type TagOptional = SpecialTag<'?'>;
 type TagUnknown = SpecialTag<'unknown'>;
-export type TagCycle<T> = SpecialTag<'cycle', T>;
+export type TagCycle<T> = SpecialTag<'cycle', { data: T }>;
 
 export type AnyFn = (...args: any[]) => any;
 

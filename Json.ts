@@ -1,4 +1,4 @@
-import { AnyFn, IfOptional, Pretty, TagCycle, TagCycles } from './TypeUtils.js';
+import { AnyFn, IfOptional, Pretty, Tagged, TagCycle, TagCycles } from './TypeUtils.js';
 
 export interface Jsonable<Json> {
 	toJSON(): Json;
@@ -8,9 +8,8 @@ type NeverJson = undefined | symbol | AnyFn;
 type EmptyJson = Map<any, any> | Set<any> | WeakMap<any, any> | WeakSet<any> | RegExp;
 
 const JsonError: unique symbol = Symbol('JsonError');
-
-export type JsonError<T, Data = never> = [Data] extends [never] ? { [JsonError]: T } : { [JsonError]: T; data: Data };
-export type JsonCycleError<T> = JsonError<'cycle-detected', T>;
+export type JsonError<T, Data = {}> = Tagged<typeof JsonError, T, Data>;
+export type JsonCycleError<T> = JsonError<'cycle-detected', { data: T }>;
 
 type JsonProperty<T, P extends keyof T = keyof T> = P extends string | number ? (_Json<T[P]> extends never ? never : P) : never;
 type OptionalKeys<T, K> = K extends keyof T ? IfOptional<T, K, K, never> : never;
