@@ -1,4 +1,4 @@
-import { AnyFn, IfOptional, Pretty, Tagged, TagCycle, TagCycles } from './TypeUtils.js';
+import { AnyFn, IfOptional, Pretty, Tagged, TagCycle, TagCycles, IsAny } from './TypeUtils.js';
 
 export interface Jsonable<Json> {
 	toJSON(): Json;
@@ -23,6 +23,7 @@ type _JsonObject<T, K extends Keys<T, any>> =
 
 // prettier-ignore
 type _Json<T, IsRoot = true> = 
+	IsAny<T> extends true ? any :
 	T extends TagCycle<infer X> ? (X extends Jsonable<infer J> ? Json<J, false> : JsonCycleError<X>) : 
 	T extends Jsonable<infer J> ? (IsRoot extends true ? Json<J, false> : _Json<Omit<T, 'toJSON'>>) : 
 	T extends NeverJson ? never :

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import type { Json, Jsonable, JsonError } from '../Json.js';
+import type { Json, Jsonable, JsonCycleError, JsonError } from '../Json.js';
 import { IsIdentical, Pretty, TagCycles } from '../TypeUtils.js';
 
 describe('Json<T> maps types to their serialized versions', () => {
@@ -150,7 +150,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Y = { x: X };
 		type A = Json<X>;
 
-		const r: IsIdentical<A, { y: { x: JsonError<'cycle-detected', X> } }> = true;
+		const r: IsIdentical<A, { y: { x: JsonCycleError<X> } }> = true;
 	});
 
 	it('breaks cycles if toJSON is encountered', () => {
@@ -171,6 +171,14 @@ describe('Json<T> maps types to their serialized versions', () => {
 
 		type IsError = A_Prop extends JsonError<'cycle-detected', any> ? true : false;
 		const check: IsError = true;
+	});
+
+	it('handles any and optional any without infinite recursion', () => {
+		type Input = { a?: any; b: any };
+		type Expected = { a?: any; b: any };
+		type Actual = Json<Input>;
+
+		const check: IsIdentical<Actual, Expected> = true;
 	});
 
 	it('detects bigint as JsonError', () => {
