@@ -181,6 +181,14 @@ describe('Json<T> maps types to their serialized versions', () => {
 		const check: IsIdentical<Actual, Expected> = true;
 	});
 
+	it('handles objects with both properties and indexers', () => {
+		type Input = { hello: { value: number; [key: string]: any } };
+		type Actual = Json<Input>;
+		type Expected = { hello: { value: number; [key: string]: any } };
+
+		const check: IsIdentical<Actual, Expected> = true;
+	});
+
 	it('detects bigint as JsonError', () => {
 		type Actual = Json<{ a: bigint }>;
 		type Expected = { a: { [K in any]: 'bigint-not-serializeable' } };
