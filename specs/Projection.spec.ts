@@ -1,6 +1,6 @@
 import { describe, it } from '@jest/globals';
-import type { ExpectSame } from './ExpectSame.js';
 import type { Projected, Projection, ProjectionError } from '../Projection.js';
+import { IsIdentical } from '../TypeUtils.js';
 
 type IsError<T> = T extends ProjectionError<any> ? true : false;
 type ExpectFail = [never];
@@ -52,14 +52,14 @@ describe('Projected is the resulting type', () => {
 	it('acts as pick for inclusion (1)', () => {
 		type Input = { a: number; b: { c: string } };
 		type Result = Projected<Input, { b: 1 }>;
-		const check: ExpectSame<Pick<Input, 'b'>, Result> = true;
+		const check: IsIdentical<Pick<Input, 'b'>, Result> = true;
 	});
 
 	it('acts as omit for exlcusion (0)', () => {
 		type Input = { a: number; b: { c: string } };
 		type Result = Projected<Input, { a: 0 }>;
 
-		const check: ExpectSame<Omit<Input, 'a'>, Result> = true;
+		const check: IsIdentical<Omit<Input, 'a'>, Result> = true;
 	});
 
 	it('handles nested inclusion (1)', () => {
@@ -67,7 +67,7 @@ describe('Projected is the resulting type', () => {
 		type Result = Projected<Input, { 'a.b': 1 }>;
 		type Expected = { a: { b: number } };
 
-		const check: ExpectSame<Expected, Result> = true;
+		const check: IsIdentical<Expected, Result> = true;
 	});
 
 	it('handles nested exclusion (0)', () => {
@@ -75,7 +75,7 @@ describe('Projected is the resulting type', () => {
 		type Result = Projected<Input, { 'a.b': 0 }>;
 		type Expected = { a: { c: string }; d: number };
 
-		const check: ExpectSame<Expected, Result> = true;
+		const check: IsIdentical<Expected, Result> = true;
 	});
 
 	it('handles arrays with inclusion', () => {
@@ -83,7 +83,7 @@ describe('Projected is the resulting type', () => {
 		type Result = Projected<Input, { 'items.name': 1 }>;
 		type Expected = { items: { name: string }[] };
 
-		const check: ExpectSame<Expected, Result> = true;
+		const check: IsIdentical<Expected, Result> = true;
 	});
 
 	it('handles arrays with exclusion', () => {
@@ -91,16 +91,16 @@ describe('Projected is the resulting type', () => {
 		type Result = Projected<Input, { 'items.name': 0 }>;
 		type Expected = { items: { age: number }[] };
 
-		const check: ExpectSame<Expected, Result> = true;
+		const check: IsIdentical<Expected, Result> = true;
 	});
 
 	it('handles any input', () => {
 		type Result = Projected<any, { a: 1 }>;
-		const check: ExpectSame<any, Result> = true;
+		const check: IsIdentical<any, Result> = true;
 	});
 
 	it('handles unknown input', () => {
 		type Result = Projected<unknown, { a: 1 }>;
-		const check: ExpectSame<unknown, Result> = true;
+		const check: IsIdentical<unknown, Result> = true;
 	});
 });

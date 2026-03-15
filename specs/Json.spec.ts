@@ -1,7 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import type { Json, Jsonable, JsonError } from '../Json.js';
-import { ExpectSame } from './ExpectSame.js';
-import { Pretty, TagCycles } from '../TypeUtils.js';
+import { IsIdentical, Pretty, TagCycles } from '../TypeUtils.js';
 
 describe('Json<T> maps types to their serialized versions', () => {
 	type ExpectFail = [never];
@@ -20,7 +19,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 	it('keeps optionality', () => {
 		type X = { a: string; b?: number };
 		type J = Json<X>;
-		const r: ExpectSame<X, J> = true;
+		const r: IsIdentical<X, J> = true;
 	});
 
 	it('follows toJSON', () => {
@@ -52,7 +51,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type T = Pretty<TagCycles<X>>;
 		type J = Json<X>;
 		const y: Json<X> = x;
-		const check: ExpectSame<Json<typeof x>, typeof x> = true;
+		const check: IsIdentical<Json<typeof x>, typeof x> = true;
 	});
 
 	it('excludes undefined and functions', () => {
@@ -117,7 +116,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Expected = { a?: string; b: number };
 		type Actual = Json<Input>;
 
-		const check: ExpectSame<Actual, Expected> = true;
+		const check: IsIdentical<Actual, Expected> = true;
 	});
 
 	it('handles tuples and preserves structure', () => {
@@ -125,7 +124,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Expected = [string, number];
 		type Actual = Json<Input>;
 
-		const check: ExpectSame<Actual, Expected> = true;
+		const check: IsIdentical<Actual, Expected> = true;
 	});
 
 	it('converts everything that would be omitted to null in arrays', () => {
@@ -151,7 +150,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type Y = { x: X };
 		type A = Json<X>;
 
-		const r: ExpectSame<A, { y: { x: JsonError<'cycle-detected', X> } }> = true;
+		const r: IsIdentical<A, { y: { x: JsonError<'cycle-detected', X> } }> = true;
 	});
 
 	it('breaks cycles if toJSON is encountered', () => {
@@ -159,7 +158,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		type B = { a: A };
 
 		type Result = Pretty<Json<B>>;
-		const r: ExpectSame<Result, { a: string }> = true;
+		const r: IsIdentical<Result, { a: string }> = true;
 	});
 
 	it('detects cycles when toJSON returns a circular structure', () => {

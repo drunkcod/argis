@@ -1,6 +1,5 @@
 import { describe, it } from '@jest/globals';
-import { Substitute, Pretty } from '../TypeUtils.js';
-import { ExpectSame } from './ExpectSame.js';
+import { Substitute, IsIdentical } from '../TypeUtils.js';
 
 describe('Substitute', () => {
 	it('substitutes a simple type', () => {
@@ -8,7 +7,7 @@ describe('Substitute', () => {
 		type Target = string;
 		type Replacement = boolean;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { a: number; b: boolean }> = true;
+		const r: IsIdentical<Result, { a: number; b: boolean }> = true;
 	});
 
 	it('substitutes recursively', () => {
@@ -16,7 +15,7 @@ describe('Substitute', () => {
 		type Target = string;
 		type Replacement = number;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { a: { b: number } }> = true;
+		const r: IsIdentical<Result, { a: { b: number } }> = true;
 	});
 
 	it('substitutes in arrays', () => {
@@ -24,7 +23,7 @@ describe('Substitute', () => {
 		type Target = string;
 		type Replacement = number;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { a: number[] }> = true;
+		const r: IsIdentical<Result, { a: number[] }> = true;
 	});
 
 	it('plugs a hole in a recursive structure', () => {
@@ -37,7 +36,7 @@ describe('Substitute', () => {
 
 		type Result = Substitute<Tree, Node, BrokenNode>;
 
-		const r: ExpectSame<Result, { root: { value: number; next: null } }> = true;
+		const r: IsIdentical<Result, { root: { value: number; next: null } }> = true;
 	});
 
 	it('works with optional properties', () => {
@@ -47,10 +46,10 @@ describe('Substitute', () => {
 		type Result = Substitute<Input, Target, Replacement>;
 
 		type PropA = Result['a'];
-		const a: ExpectSame<PropA, boolean | undefined> = true;
+		const a: IsIdentical<PropA, boolean | undefined> = true;
 
 		type PropB = Result['b'];
-		const b: ExpectSame<PropB, number> = true;
+		const b: IsIdentical<PropB, number> = true;
 	});
 
 	it('handles any correctly', () => {
@@ -58,7 +57,7 @@ describe('Substitute', () => {
 		type Target = string;
 		type Replacement = number;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { a: any; b: number }> = true;
+		const r: IsIdentical<Result, { a: any; b: number }> = true;
 	});
 
 	it('handles unknown correctly', () => {
@@ -66,7 +65,7 @@ describe('Substitute', () => {
 		type Target = string;
 		type Replacement = number;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { a: unknown; b: number }> = true;
+		const r: IsIdentical<Result, { a: unknown; b: number }> = true;
 	});
 
 	it('does not break functions', () => {
@@ -76,7 +75,7 @@ describe('Substitute', () => {
 		type Replacement = number;
 		type Result = Substitute<Input, Target, Replacement>;
 		// Function internal types (args/return) are not substituted unless the function itself is the target
-		const r: ExpectSame<Result, { f: F; b: number }> = true;
+		const r: IsIdentical<Result, { f: F; b: number }> = true;
 	});
 
 	it('substitutes the function itself if it is the target', () => {
@@ -85,6 +84,6 @@ describe('Substitute', () => {
 		type Target = F;
 		type Replacement = string;
 		type Result = Substitute<Input, Target, Replacement>;
-		const r: ExpectSame<Result, { f: string; b: string }> = true;
+		const r: IsIdentical<Result, { f: string; b: string }> = true;
 	});
 });

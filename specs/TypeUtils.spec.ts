@@ -1,6 +1,5 @@
 import { describe, test } from '@jest/globals';
-import { PickRequired, IsAny, IsUnknown, IsOptional } from '../TypeUtils.js';
-import { ExpectSame } from './ExpectSame.js';
+import { PickRequired, IsAny, IsUnknown, IsOptional, IsIdentical } from '../TypeUtils.js';
 
 describe('TypeUtils', () => {
 	test('IsAny', () => {
@@ -21,6 +20,6 @@ describe('TypeUtils', () => {
 	test('PickRequired', () => {
 		type T = { a: string; b?: number; c: boolean | undefined };
 		type R = PickRequired<T>;
-		const r: ExpectSame<R, { a: string; c: boolean | undefined }> = true;
+		const r: IsIdentical<R, { a: string; c: boolean | undefined }> = true;
 	});
 });
