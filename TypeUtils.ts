@@ -1,4 +1,5 @@
-export type Pretty<T> = { [P in keyof T]: T[P] } & {};
+export type Pretty<T> = T extends object ? { [P in keyof T]: T[P] } & {} : T;
+export type Optional<T, K extends keyof T> = Pretty<Omit<T, K> & Partial<Pick<T, K>>>;
 
 const SPECIAL_TAG: unique symbol = Symbol('');
 type SpecialTag<T, Data = never> = { readonly [SPECIAL_TAG]: T; data: Data };

@@ -8,19 +8,24 @@ type NeverJson = undefined | symbol | AnyFn;
 type EmptyJson = Map<any, any> | Set<any> | WeakMap<any, any> | WeakSet<any> | RegExp;
 
 const JsonError: unique symbol = Symbol('JsonError');
+
 export type JsonError<T, Data = never> = [Data] extends [never] ? { [JsonError]: T } : { [JsonError]: T; data: Data };
+export type JsonCycleError<T> = JsonError<'cycle-detected', T>;
 
-type JsonProperty<T, P extends keyof T> = P extends string | number ? (Json<T[P]> extends never ? never : P) : never;
+type JsonProperty<T, P extends keyof T = keyof T> = P extends string | number ? (_Json<T[P]> extends never ? never : P) : never;
+type OptionalKeys<T, K> = K extends keyof T ? IfOptional<T, K, K, never> : never;
+type Keys<T, K extends keyof T, Optional = OptionalKeys<T, K>> = { required: Exclude<K, Optional>; optional: Optional };
 
+type JsonObject<T> = _JsonObject<T, Keys<T, JsonProperty<T>>>;
 // prettier-ignore
-type JsonObject<T> = 
-	{ [P in keyof T as IfOptional<T, P, never, JsonProperty<T, P>>]: Pretty<_Json<T[P]>> } & 
-	{ [P in keyof T as IfOptional<T, P, JsonProperty<T, P>, never>]?: Pretty<_Json<T[P]>> };
+type _JsonObject<T, K extends Keys<T, any>> =
+	{ [P in K['required']]: Pretty<_Json<T[P]>> } & 
+	{ [P in K['optional']]?: Pretty<_Json<T[P]>> };
 
 // prettier-ignore
 type _Json<T, IsRoot = true> = 
-	T extends TagCycle<infer X> ? (X extends Jsonable<infer J> ? _Json<TagCycles<J>, false> : JsonError<'cycle-detected', X>) : 
-	T extends Jsonable<infer J> ? (IsRoot extends true ? _Json<TagCycles<J>, false> : _Json<Omit<T, 'toJSON'>>) : 
+	T extends TagCycle<infer X> ? (X extends Jsonable<infer J> ? Json<J, false> : JsonCycleError<X>) : 
+	T extends Jsonable<infer J> ? (IsRoot extends true ? Json<J, false> : _Json<Omit<T, 'toJSON'>>) : 
 	T extends NeverJson ? never :
 	T extends EmptyJson ? Record<string, never> :
 	T extends bigint ? JsonError<'bigint-not-serializeable'> :

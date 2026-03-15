@@ -17,6 +17,12 @@ describe('Json<T> maps types to their serialized versions', () => {
 		expect(typeof y.date).toBe('string');
 	});
 
+	it('keeps optionality', () => {
+		type X = { a: string; b?: number };
+		type J = Json<X>;
+		const r: ExpectSame<X, J> = true;
+	});
+
 	it('follows toJSON', () => {
 		const x = {
 			toJSON() {
@@ -99,7 +105,7 @@ describe('Json<T> maps types to their serialized versions', () => {
 		m.toJSON = () => 1;
 		const f = (() => {}) as (() => void) & Jsonable<number>;
 		f.toJSON = () => 2;
-
+		type J = Json<typeof x>;
 		const x = { m, f };
 		const json = expectJSON<typeof x, { m: number; f: number }>(x);
 		const y: Success<typeof json> = json;
